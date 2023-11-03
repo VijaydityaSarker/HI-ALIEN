@@ -1,4 +1,4 @@
-# UFO Data Visualisation- Vega-lite Visualisation
+# Hi Alien is a UFO Data Vega-lite Visualisation Dashboard
 
 •	Developed an interactive visualisation dashboard using Vega-Lite to explore and analyse a complex quantitative dataset from the 2019 Tidy Tuesday Collection.
 
