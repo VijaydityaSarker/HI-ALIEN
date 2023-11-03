@@ -1,0 +1,244 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1000,
+  "height": 500,
+  "background": "lavender",
+  "data": {
+    "url": "https://raw.githubusercontent.com/VijaydityaSarker/UFO3DATASET/main/myufodata3.csv"
+  },
+  "title": {
+    "text": "HI ALIEN!",
+    "fontSize": 40,
+    "align": "center",
+    "anchor": "middle",
+    "offset": 40
+  },
+  "vconcat": [
+    {
+      "hconcat": [
+        {
+          "transform": [{"filter": {"param": "genre_selection"}}],
+          "layer": [
+            {
+              "mark": {
+                "type": "geoshape",
+                "stroke": "gray",
+                "strokeWidth": 0.5,
+                "fill": "lightgray"
+              },
+              "title": {
+                "text": "ufo sightings distribution across USA",
+                "fontSize": 20
+              },
+              "data": {
+                "url": "https://vega.github.io/vega-datasets/data/us-10m.json",
+                "format": {"type": "topojson", "feature": "states"}
+              },
+              "projection": {"type": "albersUsa"}
+            },
+            {
+              "mark": "circle",
+              "params": [
+                {
+                  "name": "legend-bind",
+                  "select": {"type": "point", "fields": ["ufo_shape"]},
+                  "bind": "legend"
+                },
+                {"name": "brush1", "select": {"type": "interval"}}
+              ],
+              "encoding": {
+                "latitude": {"field": "latitude", "type": "quantitative"},
+                "longitude": {"field": "longitude", "type": "quantitative"},
+                "size": {"value": 15},
+                "color": {"field": "ufo_shape", "type": "nominal"},
+                "opacity": {
+                  "condition": {"param": "legend-bind", "value": 1},
+                  "value": "0"
+                },
+                "tooltip": [
+                  {"field": "date_time", "type": "temporal"},
+                  {"field": "city_area", "type": "nominal"},
+                  {"field": "state", "type": "nominal"},
+                  {"field": "description", "type": "nominal"}
+                ]
+              },
+              "width": 900,
+              "height": 350
+            }
+          ]
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/VijaydityaSarker/UFO3DATASET/main/myufodata3.csv"
+          },
+          "transform": [
+            {"filter": {"param": "genre_selection"}},
+            {"filter": {"param": "legend-bind"}},
+            {"filter": {"param": "brush1"}},
+            {"timeUnit": "hours", "field": "date_time", "as": "hours"}
+          ],
+          "mark": {"type": "line", "point": true},
+          "encoding": {
+            "x": {
+              "field": "date_time",
+              "type": "ordinal",
+              "timeUnit": "hours",
+              "axis": {
+                "title": "TIME",
+                "labelFontSize": 14,
+                "titleFontSize": 18,
+                "titlePadding": 10
+              }
+            },
+            "y": {
+              "aggregate": "mean",
+              "field": "encounter_length",
+              "type": "quantitative",
+              "axis": {
+                "title": "mean of encounter length(minutes)",
+                "labelFontSize": 14,
+                "titleFontSize": 18,
+                "titlePadding": 10
+              }
+            },
+            "color": {
+              "field": "ufo_shape",
+              "type": "nominal",
+              "legend": {"title": "UFO Shape"}
+            }
+          },
+          "width": 350,
+          "height": 350
+        }
+      ]
+    },
+    {
+      "hconcat": [
+        {
+          "transform": [
+            {"timeUnit": "month", "field": "date_time", "as": "month"},
+            {"filter": {"param": "genre_selection"}},
+            {"filter": {"param": "legend-bind"}},
+            {"filter": {"param": "brush1"}},
+            {
+              "joinaggregate": [
+                {"op": "count", "field": "month", "as": "MONTHCOUNT"}
+              ]
+            },
+            {"calculate": "datum.MONTHCOUNT/12", "as": "AverageOfTotal"}
+          ],
+          "layer": [
+            {
+              "mark": "bar",
+              "encoding": {
+                "x": {
+                  "field": "date_time",
+                  "type": "ordinal",
+                  "timeUnit": "month",
+                  "axis": {
+                    "title": "MONTH",
+                    "labelFontSize": 14,
+                    "titleFontSize": 18,
+                    "titlePadding": 10
+                  }
+                },
+                "y": {
+                  "aggregate": "count",
+                  "field": "MONTHCOUNT",
+                  "type": "quantitative",
+                  "axis": {
+                    "title": "NUMBER OF SIGHTINGS",
+                    "labelFontSize": 14,
+                    "titleFontSize": 18,
+                    "titlePadding": 10
+                  }
+                },
+                "color": {
+                  "field": "ufo_shape",
+                  "type": "nominal",
+                  "legend": {"title": "UFO Shape"}
+                }
+              }
+            },
+            {
+              "mark": "rule",
+              "encoding": {
+                "y": {
+                  "aggregate": "average",
+                  "field": "AverageOfTotal",
+                  "type": "quantitative"
+                },
+                "color": {"value": "red"},
+                "size": {"value": 3}
+              }
+            }
+          ],
+          "width": 550,
+          "height": 200
+        },
+        {
+          "data": {
+            "values": [
+              {
+                "img": "https://c8.alamy.com/comp/2BWXJM5/cartoon-alien-waving-hello-2BWXJM5.jpg"
+              }
+            ]
+          },
+          "title": {"text": "MY ALIEN FRIEND", "fontSize": 18},
+          "mark": {"type": "image", "width": 200, "height": 200},
+          "encoding": {"url": {"field": "img", "type": "nominal"}}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/VijaydityaSarker/UFO3DATASET/main/myufodata3.csv"
+          },
+          "transform": [
+            {"filter": {"param": "legend-bind"}},
+            {"filter": {"param": "brush1"}}
+          ],
+          "params": [
+            {
+              "name": "genre_selection",
+              "select": {"type": "point", "fields": ["weekday"]}
+            }
+          ],
+          "mark": {"type": "bar", "point": true},
+          "encoding": {
+            "y": {
+              "field": "weekday",
+              "type": "ordinal",
+              "axis": {
+                "title": "DAYS",
+                "labelFontSize": 14,
+                "titleFontSize": 18,
+                "titlePadding": 10
+              }
+            },
+            "x": {
+              "aggregate": "average",
+              "field": "encounter_length",
+              "type": "quantitative",
+              "axis": {
+                "title": "mean of encounter length(minutes)",
+                "labelFontSize": 14,
+                "titleFontSize": 24,
+                "titlePadding": 10
+              }
+            },
+            "color": {
+              "condition": {
+                "param": "genre_selection",
+                "field": "ufo_shape",
+                "type": "nominal"
+              },
+              "value": "grey"
+            }
+          },
+          "width": 400,
+          "height": 200
+        }
+      ]
+    }
+  ],
+  "config": {}
+}
